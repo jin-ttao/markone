@@ -9,15 +9,37 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:markdown"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "markone.helloWorld",
-        "title": "Hello World"
+        "command": "markone.openEditor",
+        "title": "Open Visual Markdown Editor"
+      },
+      {
+        "command": "markone.openEditorFromExplorer", 
+        "title": "Open with Visual Markdown Editor"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "markone.openEditorFromExplorer",
+          "when": "resourceExtname == .md",
+          "group": "navigation"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "markone.openEditor",
+          "when": "resourceExtname == .md",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
