@@ -168,6 +168,22 @@ export class MarkdownEditorPanel {
         const vscode = acquireVsCodeApi();
         let vditor;
 
+        // Detect VS Code theme
+        function getVsCodeTheme() {
+            const body = document.body;
+            const computedStyle = getComputedStyle(body);
+            const bgColor = computedStyle.getPropertyValue('--vscode-editor-background');
+            // If background is dark, use dark theme
+            if (bgColor && bgColor.includes('rgb')) {
+                const rgb = bgColor.match(/\d+/g);
+                if (rgb) {
+                    const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+                    return brightness < 128 ? 'dark' : 'classic';
+                }
+            }
+            return 'classic'; // default to light theme
+        }
+
         // Initialize Vditor
         function initVditor() {
             vditor = new Vditor('vditor', {
@@ -194,7 +210,7 @@ export class MarkdownEditorPanel {
                         name: 'save',
                         tip: 'Save (Ctrl+S)',
                         tipPosition: 's',
-                        icon: '<svg><use xlink:href="#vditor-icon-save"></use></svg>',
+                        icon: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M17,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3M19,19H5V5H16.17L19,7.83V19M12,12A3,3 0 0,0 9,15A3,3 0 0,0 12,18A3,3 0 0,0 15,15A3,3 0 0,0 12,12M6,6V10H15V6H6Z"/></svg>',
                         click: () => {
                             saveContent();
                         }
@@ -203,6 +219,16 @@ export class MarkdownEditorPanel {
                 after: () => {
                     // Request initial content after Vditor is ready
                     vscode.postMessage({ command: 'getContent' });
+                    
+                    // If there's pending content, set it now
+                    if (window.pendingContent) {
+                        try {
+                            vditor.setValue(window.pendingContent);
+                            window.pendingContent = null;
+                        } catch (error) {
+                            console.error('Failed to set pending content:', error);
+                        }
+                    }
                 },
                 input: (value) => {
                     // Auto-save could be implemented here
@@ -211,17 +237,34 @@ export class MarkdownEditorPanel {
                 cache: {
                     enable: false
                 },
-                theme: 'dark'
+                theme: getVsCodeTheme()
+            }).catch(error => {
+                console.error('Failed to initialize Vditor:', error);
+                document.getElementById('vditor').innerHTML = 
+                    '<div style="padding: 20px; text-align: center; color: var(--vscode-errorForeground);">' +
+                    '<h3>Failed to load Markdown Editor</h3>' +
+                    '<p>Please check your internet connection and try again.</p>' +
+                    '<p>Error: ' + error.message + '</p>' +
+                    '</div>';
             });
         }
 
         // Save content function
         function saveContent() {
-            const content = vditor.getValue();
-            vscode.postMessage({
-                command: 'save',
-                content: content
-            });
+            if (!vditor) {
+                console.error('Vditor is not initialized');
+                return;
+            }
+            
+            try {
+                const content = vditor.getValue();
+                vscode.postMessage({
+                    command: 'save',
+                    content: content
+                });
+            } catch (error) {
+                console.error('Failed to get content from Vditor:', error);
+            }
         }
 
         // Handle messages from the extension
@@ -231,7 +274,14 @@ export class MarkdownEditorPanel {
             switch (message.command) {
                 case 'setContent':
                     if (vditor) {
-                        vditor.setValue(message.content);
+                        try {
+                            vditor.setValue(message.content);
+                        } catch (error) {
+                            console.error('Failed to set content in Vditor:', error);
+                        }
+                    } else {
+                        // Store content to set later when Vditor is ready
+                        window.pendingContent = message.content;
                     }
                     break;
             }
