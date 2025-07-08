@@ -1,71 +1,150 @@
-# markone README
+# markone - VS Code WYSIWYG Markdown Editor
 
-This is the README for your extension "markone". After writing up a brief description, we recommend including the following sections.
+A Visual Studio Code extension that provides a WYSIWYG (What You See Is What You Get) markdown editor using [Vditor](https://b3log.org/vditor/).
 
-## Features
+## 🚀 Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- **WYSIWYG Editing**: Edit markdown files visually without dealing with raw markdown syntax
+- **Real-time Sync**: Changes in the visual editor are synchronized with the original markdown file
+- **Rich Toolbar**: Full-featured toolbar with common markdown formatting options
+- **Save Support**: Save your changes using Ctrl+S (Cmd+S on Mac) or the save button
+- **Context Menu**: Right-click on .md files in explorer to open with visual editor
+- **Editor Integration**: Button in editor title bar for quick access when viewing markdown files
 
-For example if there is an image subfolder under your extension project workspace:
+## 📦 Installation
 
-\!\[feature X\]\(images/feature-x.png\)
+1. Clone this repository
+2. Run `npm install` to install dependencies
+3. Run `npm run compile` to build the extension
+4. Press F5 to open a new VS Code window with the extension loaded
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## 🎯 Usage
 
-## Requirements
+### Opening the Visual Editor
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+There are multiple ways to open the visual markdown editor:
 
-## Extension Settings
+1. **Command Palette**: 
+   - Open Command Palette (Ctrl+Shift+P / Cmd+Shift+P)
+   - Type "Open Visual Markdown Editor"
+   - Press Enter
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+2. **Explorer Context Menu**:
+   - Right-click on any .md file in the Explorer
+   - Select "Open with Visual Markdown Editor"
 
-For example:
+3. **Editor Title Bar**:
+   - Open any markdown file
+   - Click the "Open Visual Markdown Editor" button in the editor title bar
 
-This extension contributes the following settings:
+### Editing and Saving
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+- Edit your markdown content using the visual interface
+- Use the toolbar for formatting (headings, bold, italic, lists, etc.)
+- Save your changes using:
+  - Ctrl+S (Cmd+S on Mac) keyboard shortcut
+  - Click the Save button in the toolbar
+- Changes are automatically applied to the original markdown file
 
-## Known Issues
+## 🛠️ Technical Details
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+### Architecture
 
-## Release Notes
+- **Extension Entry Point**: `src/extension.ts` - Registers commands and handles VS Code integration
+- **Panel Management**: `src/panel.ts` - Manages WebView panels and communication
+- **Editor UI**: Embedded HTML with [Vditor](https://b3log.org/vditor/) library loaded via CDN
 
-Users appreciate release notes as you update your extension.
+### Communication Flow
 
-### 1.0.0
+1. User triggers the "Open Visual Markdown Editor" command
+2. Extension reads the current markdown file content
+3. WebView panel is created with Vditor editor
+4. Initial content is loaded into the visual editor
+5. User edits content in WYSIWYG mode
+6. On save, content is sent back to extension and written to file
 
-Initial release of ...
+## 🔧 Development
 
-### 1.0.1
+### Prerequisites
 
-Fixed issue #.
+- Node.js (v14 or higher)
+- VS Code (v1.101.0 or higher)
 
-### 1.1.0
+### Setup
 
-Added features X, Y, and Z.
+```bash
+# Install dependencies
+npm install
 
----
+# Compile the extension
+npm run compile
 
-## Following extension guidelines
+# Watch for changes during development
+npm run watch
+```
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+### Testing
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+1. Press F5 to open a new Extension Development Host window
+2. Open or create a .md file
+3. Test the extension functionality
 
-## Working with Markdown
+## 📁 Project Structure
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+```
+markone/
+├── src/
+│   ├── extension.ts      # Main extension entry point
+│   ├── panel.ts          # WebView panel management
+│   └── test/             # Test files
+├── package.json          # Extension manifest
+├── tsconfig.json         # TypeScript configuration
+├── esbuild.js           # Build configuration
+└── README.md            # This file
+```
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+## 🎨 Features in Detail
 
-## For more information
+### Supported Markdown Elements
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+- **Headings**: H1-H6 headings with visual hierarchy
+- **Text Formatting**: Bold, italic, strikethrough
+- **Lists**: Ordered and unordered lists with nesting
+- **Links**: Clickable links with easy editing
+- **Images**: Image embedding and display
+- **Code**: Inline code and code blocks with syntax highlighting
+- **Tables**: Visual table editing
+- **Quotes**: Blockquotes with proper formatting
+- **Horizontal Rules**: Visual dividers
 
-**Enjoy!**
+### VS Code Integration
+
+- **Theme Awareness**: Respects VS Code's dark/light theme settings
+- **File Management**: Seamless integration with VS Code's file system
+- **Error Handling**: Proper error messages and graceful degradation
+- **Context Menus**: Native VS Code context menu integration
+
+## 🚧 Roadmap
+
+Future features planned for development:
+
+- [ ] Dark mode theme improvements
+- [ ] Advanced table editing capabilities
+- [ ] Math equation support
+- [ ] Custom toolbar configuration
+- [ ] Auto-save functionality
+- [ ] Multiple file tabs support
+- [ ] Export options (HTML, PDF)
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🙏 Acknowledgments
+
+- [Vditor](https://b3log.org/vditor/) - The excellent WYSIWYG markdown editor library
+- [VS Code Extension API](https://code.visualstudio.com/api) - Microsoft's comprehensive extension platform
